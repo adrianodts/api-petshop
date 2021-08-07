@@ -2,6 +2,7 @@ const router = require('express').Router()
 const repository = require('../../repository/fornecedores')
 const Fornecedor = require('../../dto/Fornecedor')
 const FornecedorSerializer = require('../../util/Serializer').FornecedorSerializer
+const produtos = require('./produtos')
 
 router.get('/', async (req, res) => {
     const fornecedores = await repository.listar()
@@ -42,7 +43,8 @@ router.get('/:id', async (req, res, next) => {
         // })
         .then(result => {
             const serializer = new FornecedorSerializer(
-                res.getHeader('Content-Type')
+                res.getHeader('Content-Type'),
+                ['email', 'dataCriacao', 'dataAtualizacao', 'versao']
             )
             res.status(200)
             res.send(
@@ -84,5 +86,20 @@ router.delete('/:id', async (req, res, next) => {
         })
 
 })
+
+// middleware para consultar o fornecedor e inclui-lo na requisicao
+const verificarFornecedor = async (req, res, next) => {
+    try {
+        const id = req.params.idFornecedor
+        const fornecedor = new Fornecedor({ id: id })
+        await fornecedor.buscarPorId()
+        req.fornecedor = fornecedor
+        next()
+    } catch (error) {
+        next(error)
+    }
+}
+
+router.use('/:idFornecedor/produtos',  verificarFornecedor, produtos)
 
 module.exports = router

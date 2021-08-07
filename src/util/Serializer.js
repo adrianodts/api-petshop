@@ -1,17 +1,33 @@
 const SerializationNotSupported = require('../errors/SerializationNotSupported')
-
+const json2xml = require('json2xml');
+// const jsonxml = require('jsontoxml');
 class Serializer {
 
     json(dados) {
         return JSON.stringify(dados)
+    } 
+    
+    xml(dados) {
+        this.tag = this.tagSingular
+
+        if(Array.isArray(dados)) {
+            this.tag = this.tagPlural
+            dados = dados.map(dado => {
+                return {
+                    [this.tagSingular]: dado
+                }
+            })
+        }
+        return json2xml({ [this.tag]: dados })
     }
 
     serialize(dados) {
-        // console.log(`dados ${dados}`)
+        const filteredColumns = this.filter(dados)
         if (this.contentType === 'application/json') {
-            const filteredColumns = this.filter(dados)
-            console.log(`Columns: ${filteredColumns}`)
             return this.json(filteredColumns)
+        }
+        if (this.contentType === 'application/xml') {
+            return this.xml(filteredColumns)
         }
         throw new SerializationNotSupported(this.contentType)
     } 
@@ -43,21 +59,54 @@ class Serializer {
 }
 
 class FornecedorSerializer extends Serializer {
-    constructor(contentType) {
+    constructor(contentType, extraFields) {
         super()
         this.contentType = contentType
         this.publicFields = [
             'id', 
             'empresa', 
             'categoria'
-        ]
+        ].concat(extraFields || [])
+        this.tagSingular = 'fornecedor'
+        this.tagPlural = 'fornecedores'
+    }
+}
+
+class ProdutoSerializer extends Serializer {
+    constructor(contentType, extraFields) {
+        super()
+        this.contentType = contentType
+        this.publicFields = [
+            'id', 
+            'titulo',
+            'preco',
+            // 'estoque',
+            // 'fornecedor'
+        ].concat(extraFields || [])
+        this.tagSingular = 'produto'
+        this.tagPlural = 'produtos'
+    }
+}
+class ErrorSerializer extends Serializer {
+    constructor(contentType, extraFields) {
+        super(contentType)
+        this.contentType = contentType
+        this.publicFields = [
+            'id', 
+            'mensagem'
+        ].concat(extraFields || [])
+        this.tagSingular = 'erro'
+        this.tagPlural = 'errors'
     }
 }
 
 module.exports = {
     Serializer: Serializer,
     FornecedorSerializer: FornecedorSerializer,
+    ProdutoSerializer: ProdutoSerializer,
+    ErrorSerializer: ErrorSerializer,
     supportedFormats: [
-        'application/json'
+        'application/json',
+        'application/xml'
     ] 
 }

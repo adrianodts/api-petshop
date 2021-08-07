@@ -1,8 +1,8 @@
 class NotFound extends Error {
-    constructor() {
-        super('Fornecedor não foi encontrado')
+    constructor(assunto) {
+        super(`${assunto} não foi encontrado`)
         this.name = 'NotFound'
-        this.id = 999
+        this.id = 996
     }
 }
 

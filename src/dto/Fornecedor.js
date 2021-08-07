@@ -17,7 +17,7 @@ class Fornecedor {
     async buscarPorId() {
         const fornecedor = await repository.buscarPorId(this.id)
         if(!fornecedor) {
-            throw new NotFound()
+            throw new NotFound('Fornecedor')
         }
         this.empresa = fornecedor.empresa;
         this.email = fornecedor.email;
@@ -45,7 +45,7 @@ class Fornecedor {
     async atualizar() {
         const fornecedor = await repository.buscarPorId(this.id)
         if(!fornecedor) {
-            throw new NotFound()
+            throw new NotFound('Fornecedor')
         }
         const dados = this.validar()
         return await repository.atualizar(this.id, dados)
@@ -54,7 +54,7 @@ class Fornecedor {
     async excluir() {
         const fornecedor = await repository.buscarPorId(this.id)
         if(!fornecedor) {
-            throw new NotFound()
+            throw new NotFound('Fornecedor')
         }
         return repository.excluir(this.id)
     }
@@ -82,7 +82,7 @@ class Fornecedor {
         })
         // verifica se existe algum dado enviado
         if (Object.keys(dadosParaAtualizar).length === 0) {
-            throw new EmptyRequest()
+            throw new EmptyRequest('fornecedor')
         }
         // if (error.length > 0) {
         //     throw new Error(error)

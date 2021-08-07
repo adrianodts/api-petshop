@@ -6,6 +6,9 @@ const InvalidField = require('../errors/InvalidField')
 const EmptyRequest = require('../errors/EmptyRequest')
 const SerializationNotSupported = require('../errors/SerializationNotSupported')
 const supportedFormats = require('../util/Serializer').supportedFormats
+const ErrorSerializer = require('../util/Serializer').ErrorSerializer
+const Fornecedor = require('../dto/Fornecedor')
+
 const app = express()
 
 module.exports = () => {
@@ -21,7 +24,6 @@ module.exports = () => {
         }
 
         if(supportedFormats.indexOf(contentType) === -1) {
-            // throw new SerializationNotSupported(contentType)
             res.status(406)
             res.end()
             return;
@@ -57,10 +59,20 @@ module.exports = () => {
         //     mensagem: error.message,
         // })
         // res.send(json)
-        res.status(statusCode).json({
-            id: error.id,
-            mensagem: error.message,
-        })
+        
+        // res.status(statusCode).json({
+        //     id: error.id,
+        //     mensagem: error.message,
+        // })
+
+        const serializer = new ErrorSerializer(
+            res.getHeader('Content-Type')
+        )
+        res.status(statusCode)
+        res.send(serializer.serialize({ 
+            id: error.id, 
+            mensagem: error.message 
+        }))
     })
 
     return app
