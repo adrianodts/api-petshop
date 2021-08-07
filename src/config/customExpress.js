@@ -1,13 +1,13 @@
 const express = require('express')
 // const consign = require('consign')
-const fornecedores = require('../routes/fornecedores')
+const fornecedores = require('../routes/fornecedores/index')
+const fornecedoresV2 = require('../routes/fornecedores/index.v2')
 const NotFound = require('../errors/NotFound')
 const InvalidField = require('../errors/InvalidField')
 const EmptyRequest = require('../errors/EmptyRequest')
 const SerializationNotSupported = require('../errors/SerializationNotSupported')
 const supportedFormats = require('../util/Serializer').supportedFormats
 const ErrorSerializer = require('../util/Serializer').ErrorSerializer
-const Fornecedor = require('../dto/Fornecedor')
 
 const app = express()
 
@@ -45,6 +45,7 @@ module.exports = () => {
     //   .into(app)
 
     app.use('/api/fornecedores', fornecedores)
+    app.use('/api/v2/fornecedores', fornecedoresV2)
 
     app.use((error, req, res, next) => {
         let statusCode = 500
@@ -59,18 +60,6 @@ module.exports = () => {
         if(error instanceof SerializationNotSupported) {
             statusCode = 406
         }
-
-        //res.status(statusCode)
-        // const json = JSON.stringify({
-        //     id: error.id,
-        //     mensagem: error.message,
-        // })
-        // res.send(json)
-        
-        // res.status(statusCode).json({
-        //     id: error.id,
-        //     mensagem: error.message,
-        // })
 
         const serializer = new ErrorSerializer(
             res.getHeader('Content-Type')

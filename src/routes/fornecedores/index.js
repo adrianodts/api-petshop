@@ -14,9 +14,10 @@ router.options('/',  (req, res) => {
 router.get('/', async (req, res) => {
     const fornecedores = await repository.listar()
     res.status(200)
-    //res.json(fornecedores)
     const serializer = new FornecedorSerializer(
-        res.getHeader('Content-Type')
+        res.getHeader('Content-Type'), [
+            'empresa' 
+        ]
     )
     res.send(
         serializer.serialize(fornecedores)
@@ -29,7 +30,9 @@ router.post('/', async (req, res, next) => {
         // .then(result => res.status(201).json(result))
         .then(result => {
             const serializer = new FornecedorSerializer(
-                res.getHeader('Content-Type')
+                res.getHeader('Content-Type'), [
+                    'empresa' 
+                ]
             )
             res.status(201)
             res.send(
@@ -51,7 +54,7 @@ router.get('/:id', async (req, res, next) => {
         .then(result => {
             const serializer = new FornecedorSerializer(
                 res.getHeader('Content-Type'),
-                ['email', 'dataCriacao', 'dataAtualizacao', 'versao']
+                ['empresa', 'email', 'dataCriacao', 'dataAtualizacao', 'versao']
             )
             res.status(200)
             res.send(

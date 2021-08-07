@@ -64,7 +64,7 @@ class FornecedorSerializer extends Serializer {
         this.contentType = contentType
         this.publicFields = [
             'id', 
-            'empresa', 
+            // 'empresa', 
             'categoria'
         ].concat(extraFields || [])
         this.tagSingular = 'fornecedor'
