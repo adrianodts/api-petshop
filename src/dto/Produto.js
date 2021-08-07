@@ -33,16 +33,16 @@ class Produto {
     async criar() {
         this.validar()
         const produto = await repositoryProduto.criar({
-            id: this.id,
             titulo: this.titulo,
             preco: this.preco,
             estoque: this.estoque,
             fornecedor: this.fornecedor
         });
+        this.id = produto.id
         this.dataCriacao = produto.dataCriacao
         this.dataAtualizacao = produto.dataAtualizacao
         this.versao = produto.versao
-        return this
+        return produto
     }
 
     async atualizar() {
@@ -76,10 +76,10 @@ class Produto {
 
     validar() {
         if (typeof this.titulo !== 'string' || this.titulo.length === 0) {
-            throw new Error('O campo titulo está inválido')
+            throw new InvalidField('titulo')
         }
         if (typeof this.preco !== 'number' || this.preco === 0) {
-            throw new Error('O campo preco está inválido')
+            throw new InvalidField('preco')
         }
     }
 }

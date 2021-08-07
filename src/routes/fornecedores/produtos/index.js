@@ -36,10 +36,31 @@ router.get('/:id', async (req, res, next) => {
         const serializer = new ProdutoSerializer(
             res.getHeader('Content-Type')
         )
+        res.set('ETag', produto.versao)
+                const timestamp = new Date(produto.dataAtualizacao).getTime()
+                res.set('Last-Modified', timestamp)
         res.status(200)
         res.send(
             serializer.serialize(produto)
         )
+    } catch (error) {
+        next(error)
+    }
+})
+
+router.head('/:id', async (req, res, next) => {
+    try {
+        const dados = {
+            fornecedor: req.fornecedor.id,
+            id: req.params.id
+        }
+        const produto = new Produto(dados)
+        await produto.buscarPorId()
+        res.set('ETag', produto.versao)
+                const timestamp = new Date(produto.dataAtualizacao).getTime()
+                res.set('Last-Modified', timestamp)
+        res.status(200)
+        res.end()
     } catch (error) {
         next(error)
     }
@@ -50,13 +71,17 @@ router.post('/', async (req, res, next) => {
         const idFornecedor = req.fornecedor.id
         const corpo = req.body
         const produto = new Produto(Object.assign({}, corpo, { fornecedor: idFornecedor }))
-        await produto.criar() 
+        await produto.criar()
         const serializer = new ProdutoSerializer(
             res.getHeader('Content-Type')
         )
+        res.set('ETag', produto.versao)
+        const timestamp = new Date(produto.dataAtualizacao).getTime()
+        res.set('Last-Modified', timestamp)
+        res.set('Location', `/api/fornecedores/${produto.fornecedor}/produtos/${produto.id}`)
         res.status(201)
         res.send(
-            serializer.serialize(result)
+            serializer.serialize(produto)
         )
     }catch(error) {
         next(error)
@@ -73,6 +98,10 @@ router.put('/:id', async (req, res, next) => {
         const dados = Object.assign({}, dadosRecebidos, ids)
         const produto = new Produto(dados)
         await produto.atualizar()
+        await produto.buscarPorId()
+        res.set('ETag', produto.versao)
+        const timestamp = new Date(produto.dataAtualizacao).getTime()
+        res.set('Last-Modified', timestamp)
         res.status(204)
         res.end()
     } catch (error) {

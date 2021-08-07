@@ -4,6 +4,13 @@ const Fornecedor = require('../../dto/Fornecedor')
 const FornecedorSerializer = require('../../util/Serializer').FornecedorSerializer
 const produtos = require('./produtos')
 
+router.options('/',  (req, res) => {
+    res.set('Access-Control-Allow-Methods', 'GET, POST')
+    res.set('Access-Control-Allow-Headers', 'Content-Type')
+    res.status(204)
+    res.end()
+})
+
 router.get('/', async (req, res) => {
     const fornecedores = await repository.listar()
     res.status(200)

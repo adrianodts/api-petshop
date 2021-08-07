@@ -17,6 +17,13 @@ module.exports = () => {
     app.use(express.urlencoded({ extended: true }));
 
     app.use((req, res, next) => {
+        res.set('X-Powered-By', 'Gatito Petshop')
+        res.set('Access-Control-Allow-Origin', '*')
+        res.set('Access-Control-Allow-Headers', 'Content-Type')    
+        next()
+    })
+
+    app.use((req, res, next) => {
         let contentType = req.header('Accept')
 
         if (contentType === '*/*') {

@@ -1,6 +1,6 @@
 class NotFound extends Error {
-    constructor(assunto) {
-        super(`${assunto} não foi encontrado`)
+    constructor(nome) {
+        super(`${nome} não foi encontrado`)
         this.name = 'NotFound'
         this.id = 996
     }
